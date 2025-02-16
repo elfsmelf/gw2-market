@@ -1,0 +1,200 @@
+{
+  "id": "8c8adfe9-4644-410e-9d4f-25a4c8fbcf83",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.market_items": {
+      "name": "market_items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rarity": {
+          "name": "rarity",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "level": {
+          "name": "level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "buy_price": {
+          "name": "buy_price",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sell_price": {
+          "name": "sell_price",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "buy_quantity": {
+          "name": "buy_quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sell_quantity": {
+          "name": "sell_quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chat_link": {
+          "name": "chat_link",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "img": {
+          "name": "img",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weapon_type": {
+          "name": "weapon_type",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stat_name": {
+          "name": "stat_name",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_added": {
+          "name": "first_added",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_update": {
+          "name": "last_update",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_buy_price_avg": {
+          "name": "1d_buy_price_avg",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_sell_price_avg": {
+          "name": "1d_sell_price_avg",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_buy_quantity_avg": {
+          "name": "1d_buy_quantity_avg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_sell_quantity_avg": {
+          "name": "1d_sell_quantity_avg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_buy_value": {
+          "name": "1d_buy_value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_sell_value": {
+          "name": "1d_sell_value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_buy_sold": {
+          "name": "1d_buy_sold",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_sell_sold": {
+          "name": "1d_sell_sold",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_buy_listed": {
+          "name": "1d_buy_listed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_sell_listed": {
+          "name": "1d_sell_listed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_buy_delisted": {
+          "name": "1d_buy_delisted",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_sell_delisted": {
+          "name": "1d_sell_delisted",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "1d_sell_delisted_value": {
+          "name": "1d_sell_delisted_value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
