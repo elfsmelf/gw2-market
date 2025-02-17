@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import {
   Tooltip,
@@ -18,15 +16,22 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({
   hideTooltip = false,
 }) => {
   const formatValue = (val: number) => {
-    return val.toLocaleString();
+    return Math.abs(Math.round(val)).toLocaleString();
   };
 
-  const gold = Math.floor(value / 10000);
-  const silver = Math.floor((value % 10000) / 100);
-  const copper = value % 100;
+  // Round the value to the nearest integer
+  const roundedValue = Math.round(value);
+  const absValue = Math.abs(roundedValue);
+  const gold = Math.floor(absValue / 10000);
+  const silver = Math.floor((absValue % 10000) / 100);
+  const copper = Math.floor(absValue % 100);
+  const isNegative = roundedValue < 0;
 
   const content = (
-    <div className="flex items-center gap-1">
+    <div
+      className={`flex items-center gap-1 ${isNegative ? "text-red-500" : ""}`}
+    >
+      {isNegative && <span>-</span>}
       {gold > 0 && (
         <span className="flex items-center">
           {formatValue(gold)}
@@ -69,7 +74,10 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({
       <Tooltip>
         <TooltipTrigger asChild>{content}</TooltipTrigger>
         <TooltipContent>
-          <p>{formatValue(value)} copper</p>
+          <p>
+            {isNegative ? "-" : ""}
+            {formatValue(roundedValue)} copper
+          </p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -20,7 +20,13 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ArrowUpDown, ChevronDown, ChevronUp, Settings2 } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import CoinDisplay from "@/components/CoinDisplay";
@@ -58,6 +64,55 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   pageCount: number;
   initialTotal: number;
+}
+
+function DataTableViewOptions({ table }: { table: any }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto hidden h-8 lg:flex"
+        >
+          <Settings2 className="mr-2 h-4 w-4" />
+          View Columns
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[200px]">
+        <div className="p-2">
+          <div className="mb-2 text-sm font-medium">Toggle columns</div>
+          {table
+            .getAllColumns()
+            .filter((column: any) => column.getCanHide())
+            .map((column: any) => {
+              const isCoreColumn = [
+                "img",
+                "name",
+                "buy_price",
+                "sell_price",
+                "profit",
+                "daily_profit",
+                "profit_per_hour",
+                "capped_profit_per_hour",
+                "expectations",
+              ].includes(column.id);
+
+              return (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className={`capitalize ${isCoreColumn ? "font-medium" : ""}`}
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                >
+                  {column.columnDef.header}
+                </DropdownMenuCheckboxItem>
+              );
+            })}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
 function DataTableFilters<TData, TValue>({ table }: { table: any }) {
@@ -221,6 +276,31 @@ export function DataTable<TData, TValue>({
     urlState.pagination
   );
 
+  // Set default column visibility
+  const [columnVisibility, setColumnVisibility] = React.useState<
+    Record<string, boolean>
+  >({
+    // Core columns visible by default
+    img: true,
+    name: true,
+    buy_price: true,
+    sell_price: true,
+    profit: true,
+    daily_profit: true,
+    profit_per_hour: true,
+    capped_profit_per_hour: true,
+    expectations: true,
+    // Hide all other columns by default
+    velocity: false,
+    market_activity: false,
+    supply_trend: false,
+    sold_24h: false,
+    bought_24h: false,
+    sell_rate: false,
+    listing_fee: false,
+    relist_allowance: false,
+  });
+
   const [debouncedFilters] = useDebounce(columnFilters, 500);
 
   const fetchData = React.useCallback(async () => {
@@ -291,6 +371,7 @@ export function DataTable<TData, TValue>({
         pageIndex,
         pageSize,
       },
+      columnVisibility,
     },
     manualPagination: true,
     manualSorting: true,
@@ -299,97 +380,106 @@ export function DataTable<TData, TValue>({
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
   });
 
   return (
     <div>
-      <DataTableFilters table={table} />
-      <DataTableSortingInfo sorting={sorting} />
-
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <div
-                        className={`py-4 ${
-                          header.column.getCanSort()
-                            ? "cursor-pointer select-none"
-                            : ""
-                        }`}
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        <div className="flex items-center gap-2">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                          {header.column.getCanSort() && (
-                            <div className="w-4">
-                              {header.column.getIsSorted() === "asc" ? (
-                                <ChevronUp className="h-4 w-4" />
-                              ) : header.column.getIsSorted() === "desc" ? (
-                                <ChevronDown className="h-4 w-4" />
-                              ) : (
-                                <ArrowUpDown className="h-4 w-4" />
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Loading...
-                </TableCell>
-              </TableRow>
-            ) : data.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+      <div className="flex items-center justify-between py-4">
+        <DataTableFilters table={table} />
+        <DataTableViewOptions table={table} />
       </div>
 
-      <div className="flex items-center justify-between py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+      <DataTableSortingInfo sorting={sorting} />
+
+      <div className="relative rounded-md border">
+        <div className="overflow-x-auto">
+          <Table className="w-full">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={`py-4 ${
+                            header.column.getCanSort()
+                              ? "cursor-pointer select-none"
+                              : ""
+                          }`}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          <div className="flex items-center gap-2">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            {header.column.getCanSort() && (
+                              <div className="w-4 flex-none">
+                                {header.column.getIsSorted() === "asc" ? (
+                                  <ChevronUp className="h-4 w-4" />
+                                ) : header.column.getIsSorted() === "desc" ? (
+                                  <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                  <ArrowUpDown className="h-4 w-4" />
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={table.getVisibleLeafColumns().length}
+                    className="h-24 text-center"
+                  >
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              ) : data.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={table.getVisibleLeafColumns().length}
+                    className="h-24 text-center"
+                  >
+                    No results found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+        <div className="text-sm text-muted-foreground order-2 sm:order-1">
           {total.toLocaleString()} total items
         </div>
-        <div className="flex items-center space-x-6 lg:space-x-8">
-          <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Rows per page</p>
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 lg:gap-8 order-1 sm:order-2">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium whitespace-nowrap">
+              Rows per page
+            </p>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -404,7 +494,7 @@ export function DataTable<TData, TValue>({
               ))}
             </select>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -413,7 +503,7 @@ export function DataTable<TData, TValue>({
             >
               Previous
             </Button>
-            <span className="text-sm">
+            <span className="text-sm whitespace-nowrap">
               Page {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount()}
             </span>
